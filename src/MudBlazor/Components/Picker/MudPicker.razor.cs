@@ -346,6 +346,18 @@ namespace MudBlazor
         [Category(CategoryTypes.Popover.Appearance)]
         public Origin TransformOrigin { get; set; } = Origin.TopLeft;
 
+        /// <summary>
+ 		/// Fired when the element loses focus.
+ 		/// </summary>
+ 		[Parameter] public EventCallback<FocusEventArgs> OnBlur { get; set; }
+
+        protected virtual async Task OnBlurredAsync(FocusEventArgs obj)
+        {
+            if (ReadOnly)
+                return;
+            await OnBlur.InvokeAsync(obj);
+        }
+
         protected IMask _mask = null;
 
         protected async Task SetTextAsync(string value, bool callback)

@@ -38,9 +38,10 @@
              ErrorText="@ErrorText"
              Clearable="@(GetReadOnlyState() ? false : Clearable)"
              OnClearButtonClick="@(() => Clear())"
-             @onclick="OnClickAsync" />;
+			 @onclick="OnClickAsync"
+			 OnBlur="@OnBlurredAsync" />;
 
-    protected virtual RenderFragment PickerContent => null;
+	protected virtual RenderFragment PickerContent => null;
 
     protected virtual RenderFragment Render =>
     @<CascadingValue Value="@this" IsFixed="true">
