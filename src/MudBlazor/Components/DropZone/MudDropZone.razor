@@ -59,7 +59,8 @@
                         Disabled="@GetItemDisabledStatus(item)"
                         Index="indexCopy"
                         DisabledClass="@(DisabledClass ?? Container?.DisabledClass)"
-                        Class="@(GetItemClassUsingSelector(item))">
+                        Class="@(GetItemClassUsingSelector(item))"
+								identifier="@Identifier">
                 @{
                     var renderer = GetItemTemplate();
                 }

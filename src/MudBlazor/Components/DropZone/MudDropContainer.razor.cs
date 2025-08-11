@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,6 +40,10 @@ namespace MudBlazor
         [Parameter]
         [Category(CategoryTypes.DropZone.Items)]
         public IEnumerable<T> Items { get; set; } = Enumerable.Empty<T>();
+
+        [Parameter]
+        [Category(CategoryTypes.DropZone.Items)]
+        public ConcurrentDictionary<string, T>? ItemsDictionary { get; set; } = null;
 
         /// <summary>
         /// The render fragment (template) that should be used to render the items within a drop zone

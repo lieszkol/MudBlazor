@@ -147,8 +147,16 @@ namespace MudBlazor
         {
             var predicate = ItemsSelector ?? (item => Container is not null && Container.ItemsSelector is not null && Container.ItemsSelector(item, Identifier));
 
-            var items = Container?.Items.Where(predicate).OrderBy(GetItemIndex).ToArray() ?? Array.Empty<T>();
-            return items;
+            if (Container?.Items.Count() > 0)
+            {
+                var items = Container?.Items.Where(predicate).OrderBy(GetItemIndex).ToArray() ?? Array.Empty<T>();
+                return items;
+            }
+            else if (Container?.ItemsDictionary is not null && Container.ItemsDictionary.TryGetValue(Identifier, out T match))
+            {
+                return new T[] { match };
+            }
+            return new T[0];
         }
 
         private RenderFragment<T>? GetItemTemplate() => ItemRenderer ?? Container?.ItemRenderer;
