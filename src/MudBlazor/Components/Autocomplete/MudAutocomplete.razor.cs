@@ -856,6 +856,16 @@ namespace MudBlazor
             return _elementReference.SelectRangeAsync(pos1, pos2);
         }
 
+        public virtual async Task ForceUpdate()
+        {
+            await _elementReference.ForceUpdate();
+        }
+
+        public virtual void ForceRender(bool forceTextUpdate)
+        {
+            _elementReference.ForceRender(forceTextUpdate);
+        }
+
         private async Task OnTextChanged(string text)
         {
             await base.TextChanged.InvokeAsync(text);
