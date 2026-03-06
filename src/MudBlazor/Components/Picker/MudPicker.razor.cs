@@ -519,7 +519,16 @@ namespace MudBlazor
         {
             if (firstRender == true)
             {
-                await EnsureKeyInterceptor();
+                try
+                {
+                    await EnsureKeyInterceptor();
+                }
+                catch (Microsoft.JSInterop.JSException)
+                {
+                    // Race condition: the DOM element may not yet be available on the client
+                    // when Blazor Server fires OnAfterRenderAsync. This is harmless —
+                    // the key interceptor simply won't be connected for this picker instance.
+                }
             }
 
             await base.OnAfterRenderAsync(firstRender);
