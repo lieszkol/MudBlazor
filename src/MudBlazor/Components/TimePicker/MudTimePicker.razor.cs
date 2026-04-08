@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -59,6 +60,30 @@ namespace MudBlazor
                 {
                     return time.TimeOfDay;
                 }
+            }
+
+            // Lenient fallback: accept compact 24h forms without a separator
+            // ("0600", "600", "1430", "0") so users can quickly type a time on
+            // mobile without hunting for the colon. Uses the Hungarian convention
+            // of HHmm — last two digits = minutes, the rest = hours.
+            var digits = new string(value.Where(char.IsDigit).ToArray());
+            if (digits.Length is >= 1 and <= 4)
+            {
+                int hours, minutes;
+                if (digits.Length <= 2)
+                {
+                    hours = int.Parse(digits, CultureInfo.InvariantCulture);
+                    minutes = 0;
+                }
+                else
+                {
+                    var hourPart = digits[..^2];
+                    var minutePart = digits[^2..];
+                    hours = int.Parse(hourPart, CultureInfo.InvariantCulture);
+                    minutes = int.Parse(minutePart, CultureInfo.InvariantCulture);
+                }
+                if (hours is >= 0 and < 24 && minutes is >= 0 and < 60)
+                    return new TimeSpan(hours, minutes, 0);
             }
 
             HandleParsingError();
