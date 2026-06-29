@@ -177,6 +177,15 @@ namespace MudBlazor
         public bool DisableUnderLine { get; set; }
 
         /// <summary>
+        /// If true, the label will not move down into the input when the field is empty.
+        /// Forwarded to the picker's internal text field. Useful for disabled/read-only
+        /// pickers, whose empty field cannot be focused to shrink the label otherwise.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public bool ShrinkLabel { get; set; }
+
+        /// <summary>
         /// If true, no date or time can be defined.
         /// </summary>
         [Parameter]

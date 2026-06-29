@@ -16,7 +16,7 @@ namespace MudBlazor
         }
 
         protected string Classname => MudInputCssHelper.GetClassname(this,
-            () => !string.IsNullOrEmpty(Text) || Adornment == Adornment.Start || !string.IsNullOrWhiteSpace(PlaceholderStart) || !string.IsNullOrWhiteSpace(PlaceholderEnd));
+            () => !string.IsNullOrEmpty(Text) || Adornment == Adornment.Start || !string.IsNullOrWhiteSpace(PlaceholderStart) || !string.IsNullOrWhiteSpace(PlaceholderEnd) || ShrinkLabel);
 
         /// <summary>
         /// Type of the input element. It should be a valid HTML5 input type.
