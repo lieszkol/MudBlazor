@@ -67,6 +67,14 @@ namespace MudBlazor
         [CascadingParameter(Name = "HideContent")]
         internal bool HideContent { get; set; }
 
+        /// <summary>
+        /// Optional alternative text shown in the closed select input when this item is the selected value.
+        /// When null (default), the item's ChildContent is rendered in the input, as before. Use this when the
+        /// dropdown option needs a longer/descriptive label than fits the closed input (e.g. the table pager's
+        /// "Auto (amennyi kifér)" option displaying as just "Auto" when selected).
+        /// </summary>
+        [Parameter] public string SelectedText { get; set; }
+
         internal MudSelect<T> MudSelect => (MudSelect<T>)IMudSelect;
 
         private void OnUpdateSelectionStateFromOutside(IEnumerable<T> selection)

@@ -16,10 +16,17 @@
                 <div class="mud-table-pagination-information">@RowsPerPageString</div>
             </div>
             <CascadingValue Name="SubscribeToParentForm" Value="false" IsFixed>
-                <MudSelect T="int" ValueChanged="SetRowsPerPage" Value="@(Table?.RowsPerPage ?? 0)" Class="mud-table-pagination-select" DisableUnderLine="true" Dense="true">
+                @* RelativeWidth="false": the dropdown sizes to its content instead of being clamped to the
+                   narrow select input — needed so longer options like "Auto (amennyi kifér)" aren't clipped. *@
+                <MudSelect T="int" ValueChanged="SetRowsPerPageAsync" Value="@(AutoRowsPerPageSelected ? AutoPageSize : (Table?.RowsPerPage ?? 0))" Class="mud-table-pagination-select" DisableUnderLine="true" Dense="true" RelativeWidth="false">
                     @foreach (int pageSize in PageSizeOptions)
                     {
-                        if (pageSize == int.MaxValue)
+                        if (pageSize == AutoPageSize)
+                        {
+                            @* SelectedText: the closed input shows the short label while the open dropdown shows AutoItemsText *@
+                            <MudSelectItem T="int" Value="@pageSize" SelectedText="@AutoSelectedText">@AutoItemsText</MudSelectItem>
+                        }
+                        else if (pageSize == int.MaxValue)
                         {
                             <MudSelectItem T="int" Value="@pageSize">@AllItemsText</MudSelectItem>
                         }

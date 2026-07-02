@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 using MudBlazor.Utilities;
@@ -54,6 +55,13 @@ namespace MudBlazor
         [Parameter] public HorizontalAlignment HorizontalAlignment { get; set; } = HorizontalAlignment.Right;
 
         /// <summary>
+        /// Sentinel page size value representing the "Auto" option: the hosting table computes the
+        /// rows-per-page from the available container height. This value never reaches
+        /// <see cref="MudTableBase.SetRowsPerPage(int)"/> — selecting it only fires <see cref="OnAutoSelected"/>.
+        /// </summary>
+        public const int AutoPageSize = -1;
+
+        /// <summary>
         /// Define a list of available page size options for the user to choose from
         /// </summary>
         [Parameter] public int[] PageSizeOptions { get; set; } = new int[] { 10, 25, 50, 100 };
@@ -69,6 +77,36 @@ namespace MudBlazor
         /// Defines the text shown in the items per page dropdown when a user provides int.MaxValue as an option
         /// </summary>
         [Parameter] public string AllItemsText { get; set; } = "All";
+
+        /// <summary>
+        /// Defines the text shown in the items per page dropdown when a user provides <see cref="AutoPageSize"/> as an option.
+        /// </summary>
+        [Parameter] public string AutoItemsText { get; set; } = "Auto";
+
+        /// <summary>
+        /// Optional shorter text shown in the CLOSED page-size select when the Auto option is selected
+        /// (the open dropdown keeps showing <see cref="AutoItemsText"/>). When null, <see cref="AutoItemsText"/>
+        /// is shown in both places.
+        /// </summary>
+        [Parameter] public string AutoSelectedText { get; set; }
+
+        /// <summary>
+        /// When true, the page-size dropdown displays the <see cref="AutoItemsText"/> item as selected instead of the
+        /// table's current (auto-computed) RowsPerPage. Bind this to the hosting container's auto-rows-per-page mode flag.
+        /// </summary>
+        [Parameter] public bool AutoRowsPerPageSelected { get; set; }
+
+        /// <summary>
+        /// Fires when the user picks the <see cref="AutoPageSize"/> option. The sentinel is never forwarded to the table.
+        /// </summary>
+        [Parameter] public EventCallback OnAutoSelected { get; set; }
+
+        /// <summary>
+        /// Fires on every explicit concrete (non-Auto) page-size pick, BEFORE the size is forwarded to the table —
+        /// even when the picked value equals the table's current value (which MudTableBase's same-value guard would
+        /// otherwise swallow). Lets a container disable its auto mode synchronously before the RowsPerPageChanged echo.
+        /// </summary>
+        [Parameter] public EventCallback<int> OnConcretePageSizeSelected { get; set; }
 
         private string Info
         {
@@ -111,7 +149,21 @@ namespace MudBlazor
         /// </summary>
         [Parameter] public string LastIcon { get; set; } = Icons.Material.Filled.LastPage;
 
-        private void SetRowsPerPage(int size) => Table?.SetRowsPerPage(size);
+        private async Task SetRowsPerPageAsync(int size)
+        {
+            if (size == AutoPageSize)
+            {
+                // The sentinel must never reach MudTableBase (it would be treated as a real page size).
+                if (OnAutoSelected.HasDelegate)
+                    await OnAutoSelected.InvokeAsync();
+                return;
+            }
+            // Awaited BEFORE forwarding the size, so a hosting container can flip its auto mode off
+            // synchronously before Table.SetRowsPerPage fires the RowsPerPageChanged echo.
+            if (OnConcretePageSizeSelected.HasDelegate)
+                await OnConcretePageSizeSelected.InvokeAsync(size);
+            Table?.SetRowsPerPage(size);
+        }
 
         private bool BackButtonsDisabled => Table == null ? false : Table.CurrentPage == 0;
 
@@ -126,8 +178,11 @@ namespace MudBlazor
             {
                 Context.HasPager = true;
                 Context.PagerStateHasChanged = StateHasChanged;
-                var size = Table._rowsPerPage ?? PageSizeOptions.FirstOrDefault();
-                SetRowsPerPage(size);
+                // Skip the Auto sentinel when defaulting, and set the size on the table directly —
+                // routing through SetRowsPerPageAsync here would fire OnConcretePageSizeSelected on
+                // every init and disable a restored auto-rows-per-page mode.
+                var size = Table._rowsPerPage ?? PageSizeOptions.FirstOrDefault(o => o != AutoPageSize);
+                Table?.SetRowsPerPage(size);
             }
         }
 

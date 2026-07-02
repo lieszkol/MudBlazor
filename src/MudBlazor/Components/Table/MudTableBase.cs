@@ -501,12 +501,22 @@ namespace MudBlazor
             CurrentPage = Math.Min(Math.Max(0, pageIndex), NumPages - 1);
         }
 
-        public void SetRowsPerPage(int size)
+        public void SetRowsPerPage(int size) => SetRowsPerPage(size, resetCurrentPage: true);
+
+        /// <summary>
+        /// Sets the page size. When <paramref name="resetCurrentPage"/> is false the current page is
+        /// clamped to the new page count instead of being reset to 0 — used by the auto rows-per-page
+        /// feature so a window resize doesn't throw the user back to the first page.
+        /// </summary>
+        public void SetRowsPerPage(int size, bool resetCurrentPage)
         {
             if (_rowsPerPage == size)
                 return;
             _rowsPerPage = size;
-            CurrentPage = 0;
+            if (resetCurrentPage)
+                CurrentPage = 0;
+            else if (CurrentPage > 0)
+                CurrentPage = Math.Min(CurrentPage, Math.Max(0, NumPages - 1));
             StateHasChanged();
             RowsPerPageChanged.InvokeAsync(_rowsPerPage.Value);
             if (_isFirstRendered)

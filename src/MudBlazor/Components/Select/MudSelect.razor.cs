@@ -397,7 +397,7 @@ namespace MudBlazor
                     return false;
                 if (!_shadowLookup.TryGetValue(Value, out var item))
                     return false;
-                return (item.ChildContent != null);
+                return (item.ChildContent != null || item.SelectedText != null);
             }
         }
 
@@ -417,6 +417,10 @@ namespace MudBlazor
                 return null;
             if (!_shadowLookup.TryGetValue(Value, out var item))
                 return null; //<-- for now. we'll add a custom template to present values (set from outside) which are not on the list?
+            // An explicit SelectedText overrides the item's ChildContent in the closed input —
+            // lets a dropdown option carry a longer label than fits the collapsed select.
+            if (item.SelectedText != null)
+                return builder => builder.AddContent(0, item.SelectedText);
             return item.ChildContent;
         }
 
