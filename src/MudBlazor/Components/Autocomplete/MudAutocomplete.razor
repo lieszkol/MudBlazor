@@ -38,7 +38,7 @@
                     }
                 }
 
-                <MudPopover Open="@IsOpen" MaxHeight="@MaxHeight" AnchorOrigin="@AnchorOrigin" TransformOrigin="@TransformOrigin" Class="@PopoverClass" RelativeWidth="true">
+                <MudPopover Open="@IsOpen" MaxHeight="@MaxHeight" AnchorOrigin="@AnchorOrigin" TransformOrigin="@TransformOrigin" Class="@PopoverClass" RelativeWidth="@RelativeWidth">
                     @if (ProgressIndicatorInPopoverTemplate != null && IsLoading)
                     {
                         @ProgressIndicatorInPopoverTemplate

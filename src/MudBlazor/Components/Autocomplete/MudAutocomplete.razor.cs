@@ -70,6 +70,16 @@ namespace MudBlazor
         public string PopoverClass { get; set; }
 
         /// <summary>
+        /// If true (default), the dropdown popover width matches the autocomplete's anchor width.
+        /// Set to false to let the popover size to its content — useful when the autocomplete lives
+        /// in a narrow container (e.g. a table column filter cell) where an anchor-width dropdown
+        /// would wrap/clip the item labels.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListAppearance)]
+        public bool RelativeWidth { get; set; } = true;
+
+        /// <summary>
         /// User class names for the internal list, separated by space
         /// </summary>
         [Parameter]
