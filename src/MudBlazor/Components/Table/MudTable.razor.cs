@@ -195,6 +195,31 @@ namespace MudBlazor
         }
 
         /// <summary>
+        /// Row right-click event. When it has a delegate (or a subclass overrides
+        /// RowContextMenuEnabled), body rows attach an oncontextmenu handler and suppress the
+        /// browser's native context menu.
+        /// </summary>
+        [Parameter] public EventCallback<TableRowClickEventArgs<T>> OnRowContextMenu { get; set; }
+
+        protected internal override bool RowContextMenuEnabled => OnRowContextMenu.HasDelegate;
+
+        protected internal override async Task FireRowContextMenuEventAsync(MouseEventArgs args, MudTr row, object o)
+        {
+            var item = default(T);
+            try
+            {
+                item = (T)o;
+            }
+            catch (Exception) { /*ignore*/}
+            await OnRowContextMenu.InvokeAsync(new TableRowClickEventArgs<T>()
+            {
+                MouseEventArgs = args,
+                Row = row,
+                Item = item,
+            });
+        }
+
+        /// <summary>
         /// Row hover start event.
         /// </summary>
         [Parameter] public EventCallback<TableRowHoverEventArgs<T>> OnRowMouseEnter { get; set; }

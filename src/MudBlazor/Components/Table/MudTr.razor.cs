@@ -90,6 +90,16 @@ namespace MudBlazor
             await table.FireRowMouseLeaveEventAsync(args, this, Item);
         }
 
+        public async Task OnRowContextMenuAsync(MouseEventArgs args)
+        {
+            var table = Context?.Table;
+            if (table is null)
+                return;
+            // Deliberately NO SetSelectedItem / StartEditingItem: the context menu is transient
+            // and must not trigger row-selection side effects (master-detail loads, edit mode).
+            await table.FireRowContextMenuEventAsync(args, this, Item);
+        }
+
         private EventCallback<MouseEventArgs> RowMouseEnterEventCallback
         {
             get
@@ -115,6 +125,23 @@ namespace MudBlazor
                 return default;
             }
         }
+
+        // Mirrors RowMouseEnterEventCallback: returning a default EventCallback means Blazor
+        // attaches NO oncontextmenu DOM listener, so tables without the feature emit zero traffic.
+        private EventCallback<MouseEventArgs> RowContextMenuEventCallback
+        {
+            get
+            {
+                var enabled = Context?.Table?.RowContextMenuEnabled ?? false;
+
+                if (enabled)
+                    return EventCallback.Factory.Create<MouseEventArgs>(this, OnRowContextMenuAsync);
+
+                return default;
+            }
+        }
+
+        private bool RowContextMenuPreventDefault => Context?.Table?.RowContextMenuEnabled ?? false;
 
         private void StartEditingItem() => StartEditingItem(buttonClicked: true);
 

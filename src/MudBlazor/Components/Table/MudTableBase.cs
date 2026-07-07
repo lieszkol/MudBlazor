@@ -575,6 +575,20 @@ namespace MudBlazor
         internal abstract bool HasRowMouseLeaveEventHandler { get; }
         internal abstract bool IsEditable { get; }
 
+        /// <summary>
+        /// Whether body rows should attach an oncontextmenu handler (and suppress the browser's
+        /// native context menu). NOTE accessibility: protected internal — MudTr (same assembly)
+        /// reads it internally; derived tables in other assemblies (ZenTableBase in ZenUI, which
+        /// has no InternalsVisibleTo) override it via the protected path.
+        /// </summary>
+        protected internal virtual bool RowContextMenuEnabled => false;
+
+        /// <summary>
+        /// Fired by MudTr when a body row is right-clicked. Mirrors FireRowClickEventAsync but is
+        /// virtual (no-op) instead of abstract so cross-assembly subclasses can override it.
+        /// </summary>
+        protected internal virtual Task FireRowContextMenuEventAsync(MouseEventArgs args, MudTr row, object item) => Task.CompletedTask;
+
         public abstract bool ContainsItem(object item);
         public abstract void UpdateSelection();
 
