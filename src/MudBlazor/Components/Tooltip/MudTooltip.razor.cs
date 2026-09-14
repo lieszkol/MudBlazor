@@ -9,6 +9,11 @@ namespace MudBlazor
     public partial class MudTooltip : MudComponentBase
     {
         private bool _isVisible;
+        // Lazy popover: stays false until the tooltip is first shown (hover/focus/programmatic), gating the
+        // <MudPopover> in the markup. A never-shown tooltip's popover otherwise connects 2 ResizeObservers +
+        // a MutationObserver (mudPopover.js) at rest — a tooltip-dense page (the NavMenu alone has many) is a
+        // large part of the initial layout thrash. Once true it stays true, so re-showing behaves as before.
+        private bool _hasEverShown;
         private Origin _anchorOrigin;
         private Origin _transformOrigin;
 
@@ -148,6 +153,16 @@ namespace MudBlazor
                 if (value == _isVisible)
                     return;
                 _isVisible = value;
+                if (_isVisible)
+                {
+                    // Prime the placement origins and mount the popover on first show. The <MudPopover> reads
+                    // _anchorOrigin/_transformOrigin (set as a side effect of ConvertPlacement, normally via the
+                    // Classname builder) BEFORE Class="@Classname" is evaluated in attribute order, so with lazy
+                    // mounting the very first shown render would otherwise read stale default origins. Priming
+                    // here guarantees correct placement on the first hover. See _hasEverShown remarks.
+                    ConvertPlacement();
+                    _hasEverShown = true;
+                }
                 IsVisibleChanged.InvokeAsync(_isVisible).AndForget();
             }
         }

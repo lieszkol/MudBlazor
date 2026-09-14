@@ -3,7 +3,12 @@
 
 <div @attributes="UserAttributes" class="@ContainerClass" style="@RootStyle" @onmouseenter="@HandleMouseEnter" @onmouseleave="@HandleMouseLeave" @onmouseup="@HandleMouseUp" @onfocusin="@HandleFocusIn" @onfocusout="@HandleFocusOut">
     @ChildContent
-    @if (TooltipContent is not null || !string.IsNullOrEmpty(Text))
+    @* Lazy popover: only mount it (and its 2 ResizeObservers + MutationObserver, connected in mudPopover.js)
+       once the tooltip has been shown at least once (hover/focus/programmatic). A tooltip-dense page (the
+       NavMenu alone has many) would otherwise connect observers for every never-hovered tooltip at rest — a
+       large part of the initial layout thrash. After the first show the popover stays mounted (_hasEverShown
+       never goes back to false), so re-showing and the open/close animation behave exactly as before. *@
+    @if ((TooltipContent is not null || !string.IsNullOrEmpty(Text)) && _hasEverShown)
     {
         <MudPopover Open="_isVisible" Duration="@Duration" Delay="@Delay" AnchorOrigin="@_anchorOrigin" TransformOrigin="@_transformOrigin" Class="@Classname" Style="@Style" Paper="false">
             @if (TooltipContent is not null)
