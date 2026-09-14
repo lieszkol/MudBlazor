@@ -23,6 +23,12 @@
                         @GetSelectedValuePresenter()
                     }
                 </MudInput>
+				@* Lazy dropdown popover: only mount it (and its ResizeObservers, connected in mudPopover.js) once the
+				   select has been opened. Closed selects — e.g. one per column on a filter row — otherwise each
+				   connect observers at rest. The shadow items below (@ChildContent under HideContent) still resolve
+				   the selected-value display when closed, so nothing visible changes until the user opens the list. *@
+				@if (_hasEverOpened)
+				{
 				<MudPopover Open=@(_isOpen) MaxHeight="@MaxHeight" AnchorOrigin="@AnchorOrigin" TransformOrigin="@TransformOrigin" Class="@PopoverClass" RelativeWidth="@RelativeWidth">
 					<CascadingValue Value="@((IMudSelect)this)" IsFixed="true">
 						<MudList Class="@ListClass" Clickable="true" Dense="@Dense" @bind-SelectedValue="_activeItemId">
@@ -35,6 +41,7 @@
 						</MudList>
 					</CascadingValue>
 				</MudPopover>
+				}
 			</InputContent>
 		</MudInputControl>
 	</div>

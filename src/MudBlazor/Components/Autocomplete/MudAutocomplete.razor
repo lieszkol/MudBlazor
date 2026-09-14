@@ -38,6 +38,12 @@
                     }
                 }
 
+                @* Lazy dropdown popover: only mount it (and its ResizeObservers, connected in mudPopover.js) once the
+                   autocomplete has been opened. Closed autocompletes — e.g. a REFERENCE column filter per column —
+                   otherwise each connect observers at rest. The input shows the value independently, so nothing
+                   visible changes until the user opens the list. *@
+                @if (_hasEverOpened)
+                {
                 <MudPopover Open="@IsOpen" MaxHeight="@MaxHeight" AnchorOrigin="@AnchorOrigin" TransformOrigin="@TransformOrigin" Class="@PopoverClass" RelativeWidth="@RelativeWidth">
                     @if (ProgressIndicatorInPopoverTemplate != null && IsLoading)
                     {
@@ -101,6 +107,7 @@
                         </div>
                     }
                 </MudPopover>
+                }
             </InputContent>
         </MudInputControl>
     </div>

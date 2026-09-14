@@ -387,10 +387,18 @@ namespace MudBlazor
                 if (_isOpen == value)
                     return;
                 _isOpen = value;
+                if (value)
+                    _hasEverOpened = true; // mount the dropdown popover on first open (see _hasEverOpened remarks)
 
                 IsOpenChanged.InvokeAsync(_isOpen).AndForget();
             }
         }
+
+        // Lazy dropdown popover: gates the <MudPopover> in the markup so a CLOSED autocomplete doesn't connect
+        // its ResizeObservers + MutationObserver (mudPopover.js). Set true on first open via the IsOpen setter;
+        // never reset — after the first open the dropdown behaves exactly as before. Keeps every closed
+        // autocomplete (e.g. a REFERENCE column filter per column) out of the observer herd on data-dense pages.
+        private bool _hasEverOpened;
 
         private bool IsLoading => _currentSearchTask is { IsCompleted: false };
 

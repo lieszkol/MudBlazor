@@ -714,11 +714,19 @@ namespace MudBlazor
                 await OpenMenu();
         }
 
+        // Lazy dropdown popover: gates the <MudPopover> in the markup so a CLOSED select doesn't connect its
+        // ResizeObservers + MutationObserver (mudPopover.js). The shadow items (the hidden ChildContent copy)
+        // still resolve the selected-value display when closed, so nothing visible changes. On a data-dense
+        // page (e.g. a column-filter row with a select per column) this keeps every closed select out of the
+        // observer herd. Once opened it stays mounted, so re-opening behaves exactly as before.
+        private bool _hasEverOpened;
+
         public async Task OpenMenu()
         {
             if (GetDisabledState() || GetReadOnlyState())
                 return;
             _isOpen = true;
+            _hasEverOpened = true;
             UpdateIcon();
             StateHasChanged();
             await HilightSelectedValue();

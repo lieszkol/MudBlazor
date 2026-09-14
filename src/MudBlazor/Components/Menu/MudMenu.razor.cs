@@ -22,6 +22,11 @@ namespace MudBlazor
        .Build();
 
         private bool _isOpen;
+        // Lazy popover: stays false until the menu is first opened, gating the <MudPopover> in the markup.
+        // A closed menu's popover otherwise connects 2 ResizeObservers + a MutationObserver (mudPopover.js)
+        // at rest — a page full of closed menus (per-row / per-column / toolbar menus) is a large part of the
+        // data-dense-page layout thrash. Once true it stays true, so re-opening behaves exactly as before.
+        private bool _hasEverOpened;
         private bool _isMouseOver = false;
 
         [Parameter]
@@ -297,6 +302,7 @@ namespace MudBlazor
             }
 
             _isOpen = true;
+            _hasEverOpened = true; // mount the popover (see field remarks) — it stays mounted after first open
             StateHasChanged();
             IsOpenChanged.InvokeAsync(_isOpen);
         }
