@@ -394,6 +394,20 @@ namespace MudBlazor
             }
         }
 
+        /// <summary>
+        /// When true, the dropdown popover is not rendered until the autocomplete is first opened.
+        /// A mounted popover connects 2 ResizeObservers + a MutationObserver (mudPopover.js) even while
+        /// closed, so a data-dense page full of never-opened autocompletes (a column-filter row, an inline
+        /// row editor) pays that herd for nothing. Defaults to false — the upstream eager behaviour — so
+        /// the first open keeps its animation and pays no extra mount. ZenUI switches it on for
+        /// table-context instances only (ZenStyle Table or DataGrid). Note the Zen wrapper controls
+        /// (ZenEnumSelect, ZenAutocomplete, ...) do not forward this parameter, so it cannot be set
+        /// from such a call site - drive it through ZenStyle, or set it directly on a Zen*Base / Mud*.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListAppearance)]
+        public bool LazyPopover { get; set; }
+
         // Lazy dropdown popover: gates the <MudPopover> in the markup so a CLOSED autocomplete doesn't connect
         // its ResizeObservers + MutationObserver (mudPopover.js). Set true on first open via the IsOpen setter;
         // never reset — after the first open the dropdown behaves exactly as before. Keeps every closed

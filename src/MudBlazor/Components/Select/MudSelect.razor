@@ -23,11 +23,13 @@
                         @GetSelectedValuePresenter()
                     }
                 </MudInput>
-				@* Lazy dropdown popover: only mount it (and its ResizeObservers, connected in mudPopover.js) once the
-				   select has been opened. Closed selects — e.g. one per column on a filter row — otherwise each
-				   connect observers at rest. The shadow items below (@ChildContent under HideContent) still resolve
-				   the selected-value display when closed, so nothing visible changes until the user opens the list. *@
-				@if (_hasEverOpened)
+				@* Lazy dropdown popover, opt-in via LazyPopover: only mount it (and its ResizeObservers,
+				   connected in mudPopover.js) once the select has been opened. ZenUI enables this for
+				   TABLE-context instances only (ZenStyle == Table: column-filter cells, inline row editors),
+				   where most are never opened and the observer herd at rest is the real cost. Everywhere else
+				   (dialogs, toolbars) LazyPopover stays false and the popover mounts eagerly exactly as upstream
+				   does, so the first open keeps its animation and pays no extra mount. The shadow items below resolve the closed-state value display either way. *@
+				@if (!LazyPopover || _hasEverOpened)
 				{
 				<MudPopover Open=@(_isOpen) MaxHeight="@MaxHeight" AnchorOrigin="@AnchorOrigin" TransformOrigin="@TransformOrigin" Class="@PopoverClass" RelativeWidth="@RelativeWidth">
 					<CascadingValue Value="@((IMudSelect)this)" IsFixed="true">

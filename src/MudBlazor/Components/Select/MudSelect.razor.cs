@@ -688,6 +688,13 @@ namespace MudBlazor
         {
             if (MultiSelection && SelectAll)
             {
+                // LazyPopover: the real items live inside the popover, so before the first open _items is
+                // empty while _selectedValues may be full. Falling through would set the tri-state to
+                // "indeterminate" for a fully-selected select and flash that icon on the first open. Leave
+                // the previous value alone until the items register — Add() calls this again as they do.
+                if (_items.Count == 0 && _selectedValues.Count > 0)
+                    return;
+
                 var oldState = _selectAllChecked;
                 if (_selectedValues.Count == 0)
                 {
@@ -713,6 +720,20 @@ namespace MudBlazor
             else
                 await OpenMenu();
         }
+
+        /// <summary>
+        /// When true, the dropdown popover is not rendered until the select is first opened.
+        /// A mounted popover connects 2 ResizeObservers + a MutationObserver (mudPopover.js) even while
+        /// closed, so a data-dense page full of never-opened selects (a column-filter row, an inline
+        /// row editor) pays that herd for nothing. Defaults to false — the upstream eager behaviour — so
+        /// the first open keeps its animation and pays no extra mount. ZenUI switches it on for
+        /// table-context instances only (ZenStyle Table or DataGrid). Note the Zen wrapper controls
+        /// (ZenEnumSelect, ZenAutocomplete, ...) do not forward this parameter, so it cannot be set
+        /// from such a call site - drive it through ZenStyle, or set it directly on a Zen*Base / Mud*.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.ListAppearance)]
+        public bool LazyPopover { get; set; }
 
         // Lazy dropdown popover: gates the <MudPopover> in the markup so a CLOSED select doesn't connect its
         // ResizeObservers + MutationObserver (mudPopover.js). The shadow items (the hidden ChildContent copy)
@@ -958,9 +979,22 @@ namespace MudBlazor
                     await CloseMenu(true);
                     break;
                 case "Home":
+                    // LazyPopover: the real MudSelectItems live inside the popover, so on a never-opened lazy
+                    // select _items is empty and SelectFirstItem/SelectLastItem silently no-op (they
+                    // early-return on Count == 0). Open first — OpenMenu awaits HilightSelectedValue, which
+                    // begins with WaitForRender(), so the items are registered by the time we select.
+                    // Keyed on LazyPopover, NOT on _items.Count, so the condition is statically false in eager
+                    // mode: an eager select with a legitimately empty list (e.g. the FK-junction dialogs whose
+                    // "ID NOT IN (...)" where-clause can exclude every remaining option) must not pop open an
+                    // empty dropdown and its full-screen overlay. In lazy mode the list is left open, matching
+                    // how ArrowUp/ArrowDown already behave on a closed select.
+                    if (LazyPopover && !_hasEverOpened && !_isOpen)
+                        await OpenMenu();
                     await SelectFirstItem();
                     break;
                 case "End":
+                    if (LazyPopover && !_hasEverOpened && !_isOpen)
+                        await OpenMenu();
                     await SelectLastItem();
                     break;
                 case "Enter":
@@ -997,6 +1031,13 @@ namespace MudBlazor
                     {
                         if (MultiSelection)
                         {
+                            // Same lazy trap as Home/End, but this one loses data: on a never-opened lazy
+                            // multi-select _selectAllChecked is still null, so SelectAllClickAsync flips it to
+                            // true and SelectAllItems() rebuilds _selectedValues from an EMPTY _items —
+                            // silently wiping the user's selection instead of selecting everything. The column
+                            // filter cells render SelectAll="true" and stay lazy, so open first.
+                            if (LazyPopover && !_hasEverOpened && !_isOpen)
+                                await OpenMenu();
                             await SelectAllClickAsync();
                             //If we didn't add delay, it won't work.
                             await WaitForRender();

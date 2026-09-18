@@ -38,11 +38,13 @@
                     }
                 }
 
-                @* Lazy dropdown popover: only mount it (and its ResizeObservers, connected in mudPopover.js) once the
-                   autocomplete has been opened. Closed autocompletes — e.g. a REFERENCE column filter per column —
-                   otherwise each connect observers at rest. The input shows the value independently, so nothing
-                   visible changes until the user opens the list. *@
-                @if (_hasEverOpened)
+                @* Lazy dropdown popover, opt-in via LazyPopover: only mount it (and its ResizeObservers,
+                   connected in mudPopover.js) once the autocomplete has been opened. ZenUI enables this for
+                   TABLE-context instances only (ZenStyle == Table: column-filter cells, inline row editors),
+                   where most are never opened and the observer herd at rest is the real cost. Everywhere else
+                   (dialogs, toolbars) LazyPopover stays false and the popover mounts eagerly exactly as upstream
+                   does, so the first open keeps its animation and pays no extra mount. The input shows the value independently either way. *@
+                @if (!LazyPopover || _hasEverOpened)
                 {
                 <MudPopover Open="@IsOpen" MaxHeight="@MaxHeight" AnchorOrigin="@AnchorOrigin" TransformOrigin="@TransformOrigin" Class="@PopoverClass" RelativeWidth="@RelativeWidth">
                     @if (ProgressIndicatorInPopoverTemplate != null && IsLoading)
