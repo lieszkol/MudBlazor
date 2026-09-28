@@ -146,20 +146,29 @@ namespace MudBlazor
 #pragma warning restore CS0618
         }
 
+        // KarbApp fork: true while THIS overlay holds the body scroll lock. Stock MudBlazor called Lock/UnlockScrollAsync
+        // after EVERY render and again on dispose, whether or not the overlay was ever shown. Each call is a JS interop
+        // round trip whose unlockScroll removes two classes from <body> even when they are absent, which still rewrites
+        // the class attribute. A table page keeps one closed overlay per ZenTh column header, so an issue-list load sent
+        // 168 no-op unlocks and a navigation away 100 (measured 2026-09-28). Every rewrite also woke body-level
+        // MutationObservers (the KeePassXC-Browser extension rescanned every input with hit tests and pinned Edge at 100%
+        // CPU). A hidden overlay's re-render could also remove the lock of another overlay that was still open.
+        private bool _scrollLockHeld;
+
         //if not visible or CSS `position:absolute`, don't lock scroll
         protected override async Task OnAfterRenderAsync(bool firstTime)
         {
-            if (!LockScroll || Absolute)
+            // _visibleState.Value is what the markup shows: AutoClose hides the overlay before the parent's Visible follows.
+            if (LockScroll && !Absolute && _visibleState.Value)
             {
-                return;
-            }
-
-            if (Visible)
-            {
+                // Re-asserted on every render while shown, as before: another overlay closing in the meantime removes
+                // the shared body class.
+                _scrollLockHeld = true;
                 await BlockScrollAsync();
             }
-            else
+            else if (_scrollLockHeld)
             {
+                _scrollLockHeld = false;
                 await UnblockScrollAsync();
             }
         }
@@ -184,8 +193,10 @@ namespace MudBlazor
         //When disposing the overlay, remove the class that prevented scrolling
         public ValueTask DisposeAsync()
         {
-            if (IsJSRuntimeAvailable)
+            // Only an overlay that locked releases the lock (see _scrollLockHeld).
+            if (_scrollLockHeld && IsJSRuntimeAvailable)
             {
+                _scrollLockHeld = false;
                 return UnblockScrollAsync();
             }
 

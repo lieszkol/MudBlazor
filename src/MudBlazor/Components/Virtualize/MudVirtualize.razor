@@ -5,12 +5,13 @@
 
 @if (IsEnabled)
 {
-    <Virtualize Items="@Items" Context="item" OverscanCount="@OverscanCount" ItemSize="@ItemSize">
-        @if (ChildContent is not null)
-        {
-            @ChildContent(item)
-        }
-    </Virtualize>
+    @* KarbApp fork: the item template goes straight to ItemContent, which Virtualize invokes directly into its own item
+       region. Stock MudBlazor wrapped it as @ChildContent(item), one render region per item, so the @key that MudTable
+       puts on each row never met the other rows' keys: every scroll step that moved the window deleted and re-created
+       every rendered row instead of adding the rows scrolled into view (1.4 MB and 9,300 DOM insertions per step on a
+       43-row issue list, 2026-09-28). The non-virtualized branch below keeps its per-item regions on purpose: making
+       its rows keyed siblings would throw on any table that lists one item twice. *@
+    <Virtualize Items="@Items" ItemContent="@ChildContent" OverscanCount="@OverscanCount" ItemSize="@ItemSize" />
 }
 else
 {
