@@ -6,7 +6,7 @@
 @code{
 
     protected override RenderFragment InputContent=> 
-        @<MudInputControl Label="@Label" Variant="@Variant" HelperText="@HelperText" Error="@Error" 
+        @<MudInputControl Label="@Label" FieldDescription="@FieldDescription" Variant="@Variant" HelperText="@HelperText" Error="@Error" 
                           ErrorText="@ErrorText" Disabled="@GetDisabledState()" Margin="@Margin" Required="@Required"
                           @onclick="() => { if (!Editable) ToggleState(); }" ForId="@FieldId">
                <InputContent>

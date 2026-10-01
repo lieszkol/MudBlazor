@@ -11,6 +11,14 @@ namespace MudBlazor
         public MudBooleanInput() : base(new BoolConverter<T?>()) { }
 
         /// <summary>
+        /// Fork addition: explanation of the field, shown as a lightbulb icon with a tooltip next to the switch /
+        /// checkbox (see <see cref="MudInputControl.FieldDescription"/>).
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string? FieldDescription { get; set; }
+
+        /// <summary>
         /// If true, the input element will be disabled.
         /// </summary>
         [Parameter]

@@ -172,6 +172,14 @@ namespace MudBlazor
         public string Label { get; set; }
 
         /// <summary>
+        /// Fork addition: explanation of the field, shown as a lightbulb icon with a tooltip on the input control
+        /// (see <see cref="MudInputControl.FieldDescription"/>). ZenUI fills it from the field's metadata description.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string FieldDescription { get; set; }
+
+        /// <summary>
         /// If true the input will focus automatically.
         /// </summary>
         [Parameter]

@@ -154,6 +154,14 @@ namespace MudBlazor
         public string Label { get; set; }
 
         /// <summary>
+        /// Fork addition: explanation of the field, shown as a lightbulb icon with a tooltip on the picker's input
+        /// control (see <see cref="MudInputControl.FieldDescription"/>).
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public string FieldDescription { get; set; }
+
+        /// <summary>
         /// Show clear button.
         /// </summary>
         [Parameter]

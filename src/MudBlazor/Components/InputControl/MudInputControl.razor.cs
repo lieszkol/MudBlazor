@@ -100,6 +100,15 @@ namespace MudBlazor
         public string? Label { get; set; }
 
         /// <summary>
+        /// Fork addition: a short explanation of the field. When set, a small lightbulb icon with the text as its
+        /// tooltip (a <see cref="MudTooltip"/>) is shown at the top-right corner of the control (CSS:
+        /// <c>.zen-field-description</c> in karbapp.css). ZenUI fills it from MT_DataSourceDimension.Description when
+        /// the field is created, so a hover fetches nothing.
+        /// </summary>
+        [Parameter]
+        public string? FieldDescription { get; set; }
+
+        /// <summary>
         /// Variant can be Text, Filled or Outlined.
         /// </summary>
         [Parameter]

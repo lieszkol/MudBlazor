@@ -4,6 +4,18 @@
 <div @attributes="UserAttributes" class="@Classname" style="@Style">
     <div class="mud-input-control-input-container">
         @InputContent
+        @if (!string.IsNullOrWhiteSpace(FieldDescription))
+        {
+            @* Fork addition (see FieldDescription). The text is already in the parameter when the field is created, so a
+               hover fetches nothing; the MudTooltip's own hover event is the only server round trip, once per hovered bulb
+               (its popover is mounted lazily on the first hover, see MudTooltip). The svg is the Material "lightbulb" outline. *@
+            <MudTooltip Placement="Placement.Top" Delay="200" Class="zen-field-description-tip" RootClass="zen-field-description">
+                <ChildContent>
+                    <svg class="mud-icon-root mud-svg-icon" focusable="false" viewBox="0 0 24 24" role="img" aria-label="@FieldDescription">@((MarkupString)Icons.Material.Outlined.Lightbulb)</svg>
+                </ChildContent>
+                <TooltipContent>@FieldDescription</TooltipContent>
+            </MudTooltip>
+        }
         @if (!string.IsNullOrEmpty(Label))
         {
             <MudInputLabel Class="mud-input-label-inputcontrol" Variant="@Variant" Disabled=@Disabled Error="@Error" 

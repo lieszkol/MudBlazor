@@ -2,7 +2,7 @@
 @inherits MudBooleanInput<T>
 @typeparam T
 
-<MudInputControl Class="@Classname" Style="@Style" Error="@HasErrors" ErrorText="@GetErrorText()" Required="@Required">
+<MudInputControl Class="@Classname" FieldDescription="@FieldDescription" Style="@Style" Error="@HasErrors" ErrorText="@GetErrorText()" Required="@Required">
     <InputContent>
         <label class="@LabelClassname" style="@Style" @onkeydown="@HandleKeyDown" id="@_elementId">
             <span class="@SpanClassname">
