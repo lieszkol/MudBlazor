@@ -4,7 +4,7 @@
 <div @attributes="UserAttributes" class="@Classname" style="@Style">
     <div class="mud-input-control-input-container">
         @InputContent
-        @if (!string.IsNullOrWhiteSpace(FieldDescription))
+        @if (ShowFieldDescription)
         {
             @* Fork addition (see FieldDescription). The text is already in the parameter when the field is created, so a
                hover fetches nothing; the MudTooltip's own hover event is the only server round trip, once per hovered bulb

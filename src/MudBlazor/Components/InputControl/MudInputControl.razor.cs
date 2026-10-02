@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System;
+using Microsoft.AspNetCore.Components;
 using MudBlazor.Utilities;
 
 namespace MudBlazor
@@ -6,6 +7,32 @@ namespace MudBlazor
 #nullable enable
     public partial class MudInputControl : MudComponentBase
     {
+        [Inject]
+        private IServiceProvider ServiceProvider { get; set; } = default!;
+
+        // Fork addition: the host's optional say on whether field descriptions are shown at all (KarbApp switches them
+        // off on a phone). Looked up once per control; the answer is read on every render, so a change of the host's
+        // state (the late viewport refinement) takes effect on the next render. Without a registered policy: shown.
+        private IFieldDescriptionPolicy? _fieldDescriptionPolicy;
+        private bool _fieldDescriptionPolicyLookedUp;
+
+        // False means no MudTooltip (and no bulb) is generated at all. Only a control that has a description ever
+        // looks the policy up, so every other input pays nothing.
+        private bool ShowFieldDescription
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(FieldDescription))
+                    return false;
+                if (!_fieldDescriptionPolicyLookedUp)
+                {
+                    _fieldDescriptionPolicy = ServiceProvider.GetService(typeof(IFieldDescriptionPolicy)) as IFieldDescriptionPolicy;
+                    _fieldDescriptionPolicyLookedUp = true;
+                }
+                return _fieldDescriptionPolicy?.ShowFieldDescriptions ?? true;
+            }
+        }
+
         protected string Classname =>
             new CssBuilder("mud-input-control")
                 .AddClass("mud-input-required", when: () => Required)
