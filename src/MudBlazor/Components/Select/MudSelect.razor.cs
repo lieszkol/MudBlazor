@@ -67,7 +67,7 @@ namespace MudBlazor
                 if (_items[index].Disabled)
                     continue;
                 item = _items[index];
-                if (!MultiSelection)
+                if (!MultiSelection && CommitOnKeyNavigation)
                 {
                     _selectedValues.Clear();
                     _selectedValues.Add(item.Value);
@@ -77,7 +77,7 @@ namespace MudBlazor
                 }
                 else
                 {
-                    // in multiselect mode don't select anything, just hilight.
+                    // in multiselect mode (or with CommitOnKeyNavigation off) don't select anything, just hilight.
                     // selecting is done by Enter
                     HilightItem(item);
                     break;
@@ -109,7 +109,7 @@ namespace MudBlazor
             var item = items.FirstOrDefault();
             if (item == null)
                 return;
-            if (!MultiSelection)
+            if (!MultiSelection && CommitOnKeyNavigation)
             {
                 _selectedValues.Clear();
                 _selectedValues.Add(item.Value);
@@ -131,7 +131,7 @@ namespace MudBlazor
             var item = _items.LastOrDefault(x => !x.Disabled);
             if (item == null)
                 return;
-            if (!MultiSelection)
+            if (!MultiSelection && CommitOnKeyNavigation)
             {
                 _selectedValues.Clear();
                 _selectedValues.Add(item.Value);
@@ -734,6 +734,19 @@ namespace MudBlazor
         [Parameter]
         [Category(CategoryTypes.FormComponent.ListAppearance)]
         public bool LazyPopover { get; set; }
+
+        /// <summary>
+        /// Upstream behaviour (default true): in a single-select, every keyboard navigation step of the OPEN
+        /// dropdown — a typed letter (type-ahead), ArrowUp / ArrowDown, Home, End — immediately selects the item
+        /// it lands on and raises ValueChanged. That is harmless for a form field saved by a button, but a field
+        /// that persists on every value change (and fires side effects such as SAP pushes or e-mails) commits an
+        /// unintended value on the way to the intended one: typing "S" assigned the first S-user.
+        /// When false the keys only highlight the item (and scroll to it); Enter or a click commits it, which is
+        /// what multi-select already does. Ignored when MultiSelection is on.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Behavior)]
+        public bool CommitOnKeyNavigation { get; set; } = true;
 
         // Lazy dropdown popover: gates the <MudPopover> in the markup so a CLOSED select doesn't connect its
         // ResizeObservers + MutationObserver (mudPopover.js). The shadow items (the hidden ChildContent copy)
