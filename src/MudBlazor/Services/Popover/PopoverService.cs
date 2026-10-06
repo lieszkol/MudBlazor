@@ -109,9 +109,22 @@ internal class PopoverService : IPopoverService, IBatchTimerHandler<MudPopoverHo
             return;
         }
 
+        // Fork: a popover created ALREADY OPEN (the lazily mounted MudSelect / MudAutocomplete / MudMenu /
+        // MudTooltip popovers, whose first mount is their first open) is rendered by the provider before
+        // mudPopover.js has connected and placed it - that only happens in the popover's first
+        // OnAfterRenderAsync -> UpdatePopoverAsync, a server round trip later. In between, the open content
+        // flashed at the provider's top-left corner, as wide as the viewport (mud-popover-relative-width is
+        // width:100% until placePopover clamps max-width). Keep it invisible (visibility, so it still has
+        // layout for placePopover to measure) until UpdatePopoverAsync, which connects first and then
+        // re-sets the class without this marker; the class mutation re-places it before the next paint.
+        // A popover created closed needs nothing: it can only be opened through UpdatePopoverAsync.
+        var popoverClass = popover.Open
+            ? $"{popover.PopoverClass} mud-popover-pending-placement"
+            : popover.PopoverClass;
+
         var holder = new MudPopoverHolder(popover.Id)
             .SetFragment(popover.ChildContent)
-            .SetClass(popover.PopoverClass)
+            .SetClass(popoverClass)
             .SetStyle(popover.PopoverStyles)
             .SetShowContent(popover.Open)
             .SetTag(popover.Tag)

@@ -17,6 +17,12 @@
     transition: opacity;
   }
 
+  // Fork: set by PopoverService.CreatePopoverAsync on a popover created already open, removed by the
+  // first UpdatePopoverAsync once mudPopover.js has connected and placed it (prevents the unplaced flash).
+  &.mud-popover-pending-placement {
+    visibility: hidden;
+  }
+
   &:not(.mud-popover-open ) {
     pointer-events: none;
     transition-duration: 0ms !important;
