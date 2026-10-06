@@ -79,6 +79,10 @@ namespace MudBlazor
 
         private double? _resizerHeight;
         private bool _isResizing;
+        // Fork: true while the pointer is over the resizer. The hover height is measured through a JS round trip, so a
+        // quick pass over the resizer can deliver mouseleave BEFORE that measurement returns; this flag lets the late
+        // result be discarded instead of leaving the resizer stretched to the (old) full grid height.
+        private bool _isResizerHovered;
         private bool _filtersMenuVisible;
 
         #region Computed Properties and Functions
@@ -265,12 +269,22 @@ namespace MudBlazor
 
         private async Task OnResizerMouseOver()
         {
+            _isResizerHovered = true;
             if (!_isResizing)
-                _resizerHeight = await DataGrid?.GetActualHeight();
+            {
+                var actualHeight = await DataGrid?.GetActualHeight();
+                // Fork: the pointer may have left (or a drag started) while the height was being measured. A stale
+                // full-grid height left on the absolutely positioned resizer outlives the rows: once the grid shrinks,
+                // it is the only thing taller than the table, so the container scrolls and the sticky header scrolls
+                // out of view (same trap as ZenTh in ZenUI).
+                if (_isResizerHovered && !_isResizing)
+                    _resizerHeight = actualHeight;
+            }
         }
 
         private void OnResizerMouseLeave()
         {
+            _isResizerHovered = false;
             if (!_isResizing)
                 _resizerHeight = null;
         }
@@ -287,6 +301,10 @@ namespace MudBlazor
             if (finishResize)
             {
                 _isResizing = false;
+                // Fork: a drag usually ends away from the resizer, and the mouseleave during the drag kept the
+                // full-grid height (see OnResizerMouseLeave), so drop it here unless the pointer is still on the resizer.
+                if (!_isResizerHovered)
+                    _resizerHeight = null;
                 await InvokeAsync(StateHasChanged);
             }
 
