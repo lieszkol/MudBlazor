@@ -20,7 +20,9 @@ namespace MudBlazor
         private IKeyInterceptor _keyInterceptor;
         private Comparer _comparer = new(CultureInfo.InvariantCulture);
 
-        public MudNumericField() : base()
+        // FORK CHANGE (2026-10-07): decimal / double / float fields start with FlexibleNumberConverter, which reads "2,5" and
+        // "2.5" alike (the culture-only DefaultConverter turned "2.5" into an EMPTY value under hu-HU); display is unchanged.
+        public MudNumericField() : base(FlexibleNumberConverter<T>.CreateFor())
         {
             Validation = new Func<T, Task<bool>>(ValidateInput);
             #region parameters default depending on T

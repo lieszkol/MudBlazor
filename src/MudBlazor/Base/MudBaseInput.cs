@@ -21,6 +21,10 @@ namespace MudBlazor
 
         protected MudBaseInput() : base(new DefaultConverter<T>()) { }
 
+        // FORK ADDITION (2026-10-07): lets a derived input start with its own default converter (MudNumericField →
+        // FlexibleNumberConverter) without SetConverter's text refresh running inside a constructor.
+        protected MudBaseInput(Converter<T> converter) : base(converter) { }
+
         /// <summary>
         /// If true, the input element will be disabled.
         /// </summary>

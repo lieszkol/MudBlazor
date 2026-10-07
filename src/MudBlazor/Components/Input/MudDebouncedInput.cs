@@ -9,6 +9,11 @@ namespace MudBlazor
         private System.Timers.Timer _timer;
         private double _debounceInterval;
 
+        protected MudDebouncedInput() : base() { }
+
+        // FORK ADDITION (2026-10-07): passes a derived input's own default converter on to MudBaseInput (MudNumericField).
+        protected MudDebouncedInput(Converter<T> converter) : base(converter) { }
+
         /// <summary>
         /// Interval to be awaited in milliseconds before changing the Text value
         /// </summary>
