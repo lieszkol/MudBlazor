@@ -390,6 +390,15 @@ namespace MudBlazor
         public RenderFragment<MudBlazorFix.EditButtonContext> EditButtonContent { get; set; }
 
         /// <summary>
+        /// Fork addition. Rendered in the row's control cell(s) (start and/or end, like <see cref="EditButtonContent"/>)
+        /// when the table is <see cref="ReadOnly"/> and the row is not being edited, i.e. where upstream renders nothing.
+        /// Receives the row's item. Null (the default) keeps the upstream behaviour.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.Table.Editing)]
+        public RenderFragment<object> ReadOnlyRowControlContent { get; set; }
+
+        /// <summary>
         /// The method is called before the item is modified in inline editing.
         /// </summary>
         [Parameter]

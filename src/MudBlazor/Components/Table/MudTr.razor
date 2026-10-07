@@ -6,7 +6,9 @@
     @if (IsEditable && ((Context?.Table.EditButtonPosition.DisplayEditButtonAtStart() == true && Context?.Table.EditTrigger == TableEditTrigger.EditButton) || Context?.Table.ApplyButtonPosition.DisplayApplyButtonAtStart() == true))
     {
         @* Add datalabel as a placeholder to avoid jumps on small viewports *@
-        <MudTd DataLabel="&nbsp;" Class="py-3">
+        @* Fork: "mud-table-row-controls" marks the row's control cell, so ZenUI's single-click edit (zen-table-edit-keys.js)
+           can tell a click anywhere in it, padding included, from a click on the row: there it selects, never edits. *@
+        <MudTd DataLabel="&nbsp;" Class="py-3 mud-table-row-controls">
             @if (Context?.Table.EditTrigger == TableEditTrigger.EditButton && !object.ReferenceEquals(Context?.Table._editingItem, Item) && (!Context?.Table.ReadOnly ?? false) && Context?.Table.EditButtonPosition.DisplayEditButtonAtStart() == true)
             {
                 @if (Context?.Table.EditButtonContent != null)
@@ -17,6 +19,11 @@
                 {
                     <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="StartEditingItem" Disabled="Context.EditButtonDisabled(Item)" />
                 }
+            }
+            else if (Context?.Table.EditTrigger == TableEditTrigger.EditButton && !object.ReferenceEquals(Context?.Table._editingItem, Item) && (Context?.Table.ReadOnly ?? false) && Context?.Table.ReadOnlyRowControlContent != null && Context?.Table.EditButtonPosition.DisplayEditButtonAtStart() == true)
+            {
+                @* Fork addition: a read-only table has no edit button, but a page may still want a row control here (row menu). *@
+                @Context.Table.ReadOnlyRowControlContent(Item)
             }
             else if (object.ReferenceEquals(Context?.Table._editingItem, Item) && (!Context?.Table.ReadOnly ?? false) && Context?.Table.ApplyButtonPosition.DisplayApplyButtonAtStart() == true)
             {
@@ -49,7 +56,7 @@
     @if (IsEditable && ((Context?.Table.EditButtonPosition.DisplayEditButtonAtEnd() == true && Context?.Table.EditTrigger == TableEditTrigger.EditButton) || Context?.Table.ApplyButtonPosition.DisplayApplyButtonAtEnd() == true))
     {
         @* Add datalabel as a placeholder to avoid jumps on small viewports *@
-        <MudTd DataLabel="&nbsp;" Class="py-3">
+        <MudTd DataLabel="&nbsp;" Class="py-3 mud-table-row-controls">
             @if (Context?.Table.EditTrigger == TableEditTrigger.EditButton && !object.ReferenceEquals(Context?.Table._editingItem, Item) && (!Context?.Table.ReadOnly ?? false) && Context?.Table.EditButtonPosition.DisplayEditButtonAtEnd() == true)
             {
                 @if (Context?.Table.EditButtonContent != null)
@@ -60,6 +67,10 @@
                 {
                     <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="StartEditingItem" Disabled="Context.EditButtonDisabled(Item)" />
                 }
+            }
+            else if (Context?.Table.EditTrigger == TableEditTrigger.EditButton && !object.ReferenceEquals(Context?.Table._editingItem, Item) && (Context?.Table.ReadOnly ?? false) && Context?.Table.ReadOnlyRowControlContent != null && Context?.Table.EditButtonPosition.DisplayEditButtonAtEnd() == true)
+            {
+                @Context.Table.ReadOnlyRowControlContent(Item)
             }
             else if (object.ReferenceEquals(Context?.Table._editingItem, Item) && (!Context?.Table.ReadOnly ?? false) && Context?.Table.ApplyButtonPosition.DisplayApplyButtonAtEnd() == true)
             {
