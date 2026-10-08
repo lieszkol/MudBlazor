@@ -77,7 +77,7 @@ namespace MudBlazor
         /// </summary>
         /// <remarks>
         /// Defaults to <c>false</c>.
-        /// Override with <see cref="MudGlobal.Rounded"/>..
+        /// Override with <c>MudGlobal.Rounded</c>.
         /// </remarks>
         [Parameter]
         [Category(CategoryTypes.Alert.Appearance)]
