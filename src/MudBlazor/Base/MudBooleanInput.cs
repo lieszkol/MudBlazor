@@ -19,6 +19,14 @@ namespace MudBlazor
         public string? FieldDescription { get; set; }
 
         /// <summary>
+        /// Fork addition: the host's view of whether this field holds an unsaved change (yellow field + undo button on
+        /// the input control, see <see cref="MudInputControl.FieldModification"/>). ZenUI fills it for the controls of a form.
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public IFieldModification? FieldModification { get; set; }
+
+        /// <summary>
         /// If true, the input element will be disabled.
         /// </summary>
         [Parameter]

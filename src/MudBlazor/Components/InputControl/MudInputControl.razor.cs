@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using MudBlazor.Utilities;
 
@@ -33,9 +34,19 @@ namespace MudBlazor
             }
         }
 
+        // Fork addition: true while the host says the field holds an unsaved change (see FieldModification).
+        private bool IsFieldModified => FieldModification?.IsModified == true;
+
+        private async Task OnUndoClickAsync()
+        {
+            if (FieldModification != null)
+                await FieldModification.UndoAsync();
+        }
+
         protected string Classname =>
             new CssBuilder("mud-input-control")
                 .AddClass("mud-input-required", when: () => Required)
+                .AddClass("zen-field-modified", when: () => IsFieldModified)
                 .AddClass($"mud-input-control-margin-{Margin.ToDescriptionString()}", when: () => Margin != Margin.None)
                 .AddClass("mud-input-control-full-width", FullWidth)
                 .AddClass("mud-input-error", Error)
@@ -134,6 +145,16 @@ namespace MudBlazor
         /// </summary>
         [Parameter]
         public string? FieldDescription { get; set; }
+
+        /// <summary>
+        /// Fork addition: the host's view of whether this field holds an unsaved change. While
+        /// <see cref="IFieldModification.IsModified"/> is true the control root gets the <c>zen-field-modified</c> class (a yellow
+        /// field, CSS in karbapp.css) and a small undo button is rendered in the top-right corner, next to the lightbulb
+        /// of <see cref="FieldDescription"/>; its native tooltip is <see cref="IFieldModification.UndoTooltip"/> and a click
+        /// calls <see cref="IFieldModification.UndoAsync"/>. Null (the default) renders nothing extra.
+        /// </summary>
+        [Parameter]
+        public IFieldModification? FieldModification { get; set; }
 
         /// <summary>
         /// Variant can be Text, Filled or Outlined.

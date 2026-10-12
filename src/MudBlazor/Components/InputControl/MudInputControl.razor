@@ -16,6 +16,17 @@
                 <TooltipContent>@FieldDescription</TooltipContent>
             </MudTooltip>
         }
+        @if (IsFieldModified)
+        {
+            @* Fork addition (see FieldModification). A plain button with a NATIVE title: the original value shows on hover
+               without a server round trip. tabindex -1 keeps it out of the dialog's Tab order (a mouse convenience; the
+               keyboard user simply retypes). stopPropagation needs the real @onclick handler on the same element. The svg
+               is the Material "undo" outline. *@
+            <button type="button" class="zen-field-undo" tabindex="-1" title="@FieldModification!.UndoTooltip" aria-label="@FieldModification!.UndoTooltip"
+                    @onclick="OnUndoClickAsync" @onclick:stopPropagation="true">
+                <svg class="mud-icon-root mud-svg-icon" focusable="false" viewBox="0 0 24 24" aria-hidden="true">@((MarkupString)Icons.Material.Outlined.Undo)</svg>
+            </button>
+        }
         @if (!string.IsNullOrEmpty(Label))
         {
             <MudInputLabel Class="mud-input-label-inputcontrol" Variant="@Variant" Disabled=@Disabled Error="@Error" 

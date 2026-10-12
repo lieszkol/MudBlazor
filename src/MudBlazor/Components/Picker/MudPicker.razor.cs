@@ -162,6 +162,14 @@ namespace MudBlazor
         public string FieldDescription { get; set; }
 
         /// <summary>
+        /// Fork addition: the host's view of whether this field holds an unsaved change (yellow field + undo button on
+        /// the picker's input control, see <see cref="MudInputControl.FieldModification"/>).
+        /// </summary>
+        [Parameter]
+        [Category(CategoryTypes.FormComponent.Appearance)]
+        public IFieldModification FieldModification { get; set; }
+
+        /// <summary>
         /// Show clear button.
         /// </summary>
         [Parameter]
